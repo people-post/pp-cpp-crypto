@@ -17,6 +17,20 @@ Roe<MlDsaKeyPair> MlDsa::GenerateKeyPair() {
   return keys;
 }
 
+Roe<MlDsaKeyPair> MlDsa::GenerateKeyPairFromSeed(const ByteVector& seed) {
+  if (seed.size() != kMlDsa65SeedBytes) {
+    return Error("ML-DSA-65 seed must be 32 bytes");
+  }
+  EnsureSodiumInit();
+  MlDsaKeyPair keys;
+  keys.public_key.resize(kMlDsa65PublicKeyBytes);
+  keys.secret_key.resize(kMlDsa65SecretKeyBytes);
+  if (mldsa_keypair_internal(keys.public_key.data(), keys.secret_key.data(), seed.data()) != 0) {
+    return Error("ML-DSA-65 seeded keygen failed");
+  }
+  return keys;
+}
+
 Roe<ByteVector> MlDsa::Sign(const ByteVector& secret_key, const ByteVector& message) {
   if (secret_key.size() != kMlDsa65SecretKeyBytes) {
     return Error("Invalid ML-DSA-65 secret key size");

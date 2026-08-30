@@ -17,6 +17,20 @@ Roe<MlKemKeyPair> MlKem::GenerateKeyPair() {
   return keys;
 }
 
+Roe<MlKemKeyPair> MlKem::GenerateKeyPairFromSeed(const ByteVector& coins) {
+  if (coins.size() != kMlKem768KeygenCoinsBytes) {
+    return Error("ML-KEM-768 keygen coins must be 64 bytes");
+  }
+  EnsureSodiumInit();
+  MlKemKeyPair keys;
+  keys.public_key.resize(kMlKem768PublicKeyBytes);
+  keys.private_key.resize(kMlKem768PrivateKeyBytes);
+  if (mlkem_keypair_derand(keys.public_key.data(), keys.private_key.data(), coins.data()) != 0) {
+    return Error("ML-KEM-768 seeded keygen failed");
+  }
+  return keys;
+}
+
 Roe<MlKemEncapResult> MlKem::Encapsulate(const ByteVector& peer_public_key) {
   if (peer_public_key.size() != kMlKem768PublicKeyBytes) {
     return Error("Invalid ML-KEM-768 public key size");
