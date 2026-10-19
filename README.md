@@ -7,6 +7,7 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 - Vendored **libsodium** (CMake target `sodium`)
 - Lean **mlkem-native** (ML-KEM-768) and **mldsa-native** (ML-DSA-65) — CMake targets `mlkem_native` / `mldsa_native`
 - Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD), `pp::EnsureSodiumInit`, hex/base64 helpers
+- `pp::PeerIdFromMlDsaPublicKey`: the mesh PeerId of an ML-DSA-65 key (byte layout and golden vectors in `crypto/PeerId.h`)
 
 Public headers live under `include/crypto/`.
 

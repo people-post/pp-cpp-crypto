@@ -55,6 +55,7 @@ add_library(pp_crypto STATIC
   src/SodiumUtil.cpp
   src/MlDsa.cpp
   src/MlKem.cpp
+  src/PeerId.cpp
 )
 add_library(pp::crypto ALIAS pp_crypto)
 
@@ -92,6 +93,7 @@ if(PP_CRYPTO_BUILD_TESTS)
     tests/aead_test.cpp
     tests/ml_dsa_test.cpp
     tests/ml_kem_test.cpp
+    tests/peer_id_test.cpp
     tests/sodium_util_test.cpp)
   target_link_libraries(pp_crypto_test PRIVATE
     pp_crypto
