@@ -6,7 +6,7 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 
 - Vendored **libsodium** (CMake target `sodium`)
 - Lean **mlkem-native** (ML-KEM-768) and **mldsa-native** (ML-DSA-65) — CMake targets `mlkem_native` / `mldsa_native`
-- Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::EnsureSodiumInit`, hex/base64 helpers
+- Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD), `pp::EnsureSodiumInit`, hex/base64 helpers
 
 Public headers live under `include/crypto/`.
 
@@ -31,7 +31,7 @@ include(FetchContent)
 FetchContent_Declare(
   pp_cpp_crypto
   GIT_REPOSITORY https://github.com/people-post/pp-cpp-crypto.git
-  GIT_TAG v0.1.0
+  GIT_TAG v0.3.0
 )
 FetchContent_MakeAvailable(pp_cpp_crypto)
 target_link_libraries(your_target PUBLIC pp_crypto)
