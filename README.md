@@ -32,7 +32,7 @@ include(FetchContent)
 FetchContent_Declare(
   pp_cpp_crypto
   GIT_REPOSITORY https://github.com/people-post/pp-cpp-crypto.git
-  GIT_TAG v0.3.0
+  GIT_TAG v1.0.0
 )
 FetchContent_MakeAvailable(pp_cpp_crypto)
 target_link_libraries(your_target PUBLIC pp_crypto)
