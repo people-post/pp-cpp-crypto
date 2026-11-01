@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(pp-cpp-crypto VERSION 1.0.0 LANGUAGES C CXX)
+project(pp-cpp-crypto VERSION 1.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -56,6 +56,7 @@ add_library(pp_crypto STATIC
   src/MlDsa.cpp
   src/MlKem.cpp
   src/PeerId.cpp
+  src/ReplayWindow.cpp
 )
 add_library(pp::crypto ALIAS pp_crypto)
 
@@ -94,6 +95,7 @@ if(PP_CRYPTO_BUILD_TESTS)
     tests/ml_dsa_test.cpp
     tests/ml_kem_test.cpp
     tests/peer_id_test.cpp
+    tests/replay_window_test.cpp
     tests/sodium_util_test.cpp)
   target_link_libraries(pp_crypto_test PRIVATE
     pp_crypto

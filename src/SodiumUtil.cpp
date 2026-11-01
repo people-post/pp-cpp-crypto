@@ -1,5 +1,7 @@
 #include "crypto/SodiumUtil.h"
 
+#include <cstring>
+
 #include <sodium.h>
 
 #include <cctype>
@@ -80,6 +82,33 @@ std::string Base64Encode(const ByteVector& bytes) {
     out.pop_back();
   }
   return out;
+}
+
+std::string Base64UrlEncode(const ByteVector& bytes) {
+  EnsureSodiumInit();
+  std::string out(sodium_base64_ENCODED_LEN(bytes.size(), sodium_base64_VARIANT_URLSAFE_NO_PADDING), '\0');
+  sodium_bin2base64(out.data(), out.size(), bytes.data(), bytes.size(), sodium_base64_VARIANT_URLSAFE_NO_PADDING);
+  out.resize(std::strlen(out.c_str()));
+  return out;
+}
+
+Roe<ByteVector> Base64UrlDecode(const std::string& encoded) {
+  EnsureSodiumInit();
+  ByteVector out(encoded.size());
+  size_t length = 0;
+  if (sodium_base642bin(out.data(), out.size(), encoded.data(), encoded.size(), nullptr, &length, nullptr,
+                        sodium_base64_VARIANT_URLSAFE_NO_PADDING) != 0) {
+    return Error("Invalid base64url");
+  }
+  out.resize(length);
+  return out;
+}
+
+ByteVector Blake2b256(const ByteVector& data) {
+  EnsureSodiumInit();
+  ByteVector hash(crypto_generichash_BYTES);
+  crypto_generichash(hash.data(), hash.size(), data.data(), data.size(), nullptr, 0);
+  return hash;
 }
 
 } // namespace pp
