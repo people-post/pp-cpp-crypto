@@ -56,6 +56,7 @@ add_library(pp_crypto STATIC
   src/MlDsa.cpp
   src/MlKem.cpp
   src/PeerId.cpp
+  src/ReplayWindow.cpp
 )
 add_library(pp::crypto ALIAS pp_crypto)
 
@@ -94,6 +95,7 @@ if(PP_CRYPTO_BUILD_TESTS)
     tests/ml_dsa_test.cpp
     tests/ml_kem_test.cpp
     tests/peer_id_test.cpp
+    tests/replay_window_test.cpp
     tests/sodium_util_test.cpp)
   target_link_libraries(pp_crypto_test PRIVATE
     pp_crypto
