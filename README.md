@@ -11,6 +11,7 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 - Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD over BoringSSL, libsodium-compatible bytes; `SealInto` / `OpenInto` for
   allocation-free packets), `pp::EnsureSodiumInit`, hex / base64 /
   base64url helpers, `pp::Blake2b256`
+- `pp::HmacSha256`: HMAC-SHA256 under one key with its pads hashed once (BoringSSL; libsodium-compatible tags)
 - `pp::ReplayWindow`: replay protection for out-of-order sequence numbers
 - `pp::PeerIdFromMlDsaPublicKey`: the mesh PeerId of an ML-DSA-65 key (byte layout and golden vectors in `crypto/PeerId.h`)
 

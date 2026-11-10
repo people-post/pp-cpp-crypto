@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(pp-cpp-crypto VERSION 1.2.0 LANGUAGES C CXX)
+project(pp-cpp-crypto VERSION 1.3.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -77,6 +77,7 @@ endif()
 
 add_library(pp_crypto STATIC
   src/Aead.cpp
+  src/Hmac.cpp
   src/SodiumUtil.cpp
   src/MlDsa.cpp
   src/MlKem.cpp
@@ -118,6 +119,7 @@ if(PP_CRYPTO_BUILD_TESTS)
 
   add_executable(pp_crypto_test
     tests/aead_test.cpp
+    tests/hmac_test.cpp
     tests/ml_dsa_test.cpp
     tests/ml_kem_test.cpp
     tests/peer_id_test.cpp
