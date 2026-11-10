@@ -4,9 +4,12 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 
 ## Contents
 
-- Vendored **libsodium** (CMake target `sodium`)
+- Vendored **libsodium** (CMake target `sodium`), built with its SIMD implementations (picked by the CPU at run time)
+- Vendored lean **BoringSSL** (CMake targets `crypto` / `ssl`, headers in `PP_CRYPTO_BORINGSSL_INCLUDE_DIR`): the AEAD
+  engine, and TLS for consumers that want it. Windows x86 builds need NASM for its assembly
 - Lean **mlkem-native** (ML-KEM-768) and **mldsa-native** (ML-DSA-65) — CMake targets `mlkem_native` / `mldsa_native`
-- Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD), `pp::EnsureSodiumInit`, hex / base64 /
+- Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD over BoringSSL, libsodium-compatible bytes; `SealInto` / `OpenInto` for
+  allocation-free packets), `pp::EnsureSodiumInit`, hex / base64 /
   base64url helpers, `pp::Blake2b256`
 - `pp::ReplayWindow`: replay protection for out-of-order sequence numbers
 - `pp::PeerIdFromMlDsaPublicKey`: the mesh PeerId of an ML-DSA-65 key (byte layout and golden vectors in `crypto/PeerId.h`)
@@ -50,3 +53,7 @@ Release flow: land on `develop` → merge to `main` → tag `vX.Y.Z` on `main`.
 ```bash
 ./scripts/vendor_import.sh
 ```
+
+## Formatting
+
+Every first-party C/C++ source is formatted with [`.clang-format`](.clang-format) by exactly clang-format 23.1.5 (`pip install clang-format==23.1.5`; other versions format differently). Run `./scripts/check_format.sh --fix` before committing; CI fails on an unformatted file. Vendored code is left as it came.

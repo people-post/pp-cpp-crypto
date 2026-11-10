@@ -153,10 +153,10 @@ add_library(${PROJECT_NAME}
   src/libsodium/crypto_stream/chacha20/stream_chacha20.c
   src/libsodium/crypto_stream/chacha20/stream_chacha20.h
   src/libsodium/crypto_stream/crypto_stream.c
+  src/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c
   src/libsodium/crypto_stream/salsa20/ref/salsa20_ref.h
   src/libsodium/crypto_stream/salsa20/stream_salsa20.c
   src/libsodium/crypto_stream/salsa20/stream_salsa20.h
-  src/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c
   src/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.c
   src/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.h
   src/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.c
@@ -308,12 +308,14 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 )
 
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+if(MSVC)
+  # MSVC and clang-cl: private/common.h defines the intrinsics it may use.
   target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+else()
+  # GCC and Clang: what libsodium's configure would detect, per target
+  # architecture (see the header). Without it the SIMD code compiles empty.
   target_compile_options(${PROJECT_NAME}
-    PUBLIC -mavx2
-    PRIVATE -maes -mpclmul -mssse3
-  )
+    PRIVATE "SHELL:-include \"${CMAKE_CURRENT_SOURCE_DIR}/pp_sodium_features.h\"")
 endif()
 
 if(NOT TARGET sodium::sodium)

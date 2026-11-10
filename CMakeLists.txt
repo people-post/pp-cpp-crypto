@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(pp-cpp-crypto VERSION 1.1.0 LANGUAGES C CXX)
+project(pp-cpp-crypto VERSION 1.2.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,6 +25,31 @@ endif()
 if(NOT TARGET mldsa_native)
   add_subdirectory("${PP_CRYPTO_THIRD_PARTY_DIR}/mldsa-native"
                    "${CMAKE_CURRENT_BINARY_DIR}/third_party/mldsa-native" EXCLUDE_FROM_ALL)
+endif()
+
+# BoringSSL: the AEAD engine (see third_party/boringssl/README.pp-cpp-crypto.md) and TLS for consumers. The
+# vendored tree carries no tests, so it is configured with BUILD_TESTING off; the function scope keeps that and the
+# other settings out of the consumer's cache.
+function(pp_crypto_add_boringssl)
+  set(BUILD_TESTING OFF)
+  set(BUILD_SHARED_LIBS OFF)
+  if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64|x86_64|amd64|x86|i[3-6]86")
+    include(CheckLanguage)
+    check_language(ASM_NASM)
+    if(NOT CMAKE_ASM_NASM_COMPILER)
+      message(WARNING "pp-cpp-crypto: NASM not found; BoringSSL builds without assembly (slower AEAD)")
+      set(OPENSSL_NO_ASM ON)
+    endif()
+  endif()
+  add_subdirectory("${PP_CRYPTO_THIRD_PARTY_DIR}/boringssl"
+                   "${CMAKE_CURRENT_BINARY_DIR}/third_party/boringssl" EXCLUDE_FROM_ALL)
+  # For a consumer's find_package(OpenSSL) shim (curl wants a header directory, not a target).
+  set(PP_CRYPTO_BORINGSSL_INCLUDE_DIR "${PP_CRYPTO_THIRD_PARTY_DIR}/boringssl/include"
+      CACHE INTERNAL "BoringSSL public headers (targets crypto / ssl)")
+endfunction()
+
+if(NOT TARGET crypto)
+  pp_crypto_add_boringssl()
 endif()
 
 # --- pp_common (Error / Roe) ---
@@ -71,13 +96,14 @@ target_link_libraries(pp_crypto PUBLIC
   mldsa_native
   mlkem_native
 )
+target_link_libraries(pp_crypto PRIVATE crypto)
 
 if(MSVC)
   target_compile_definitions(pp_crypto PUBLIC NOMINMAX)
 endif()
 
 # FetchContent consumers link the build-tree targets. Skip install(EXPORT):
-# sodium / mldsa_native / mlkem_native are EXCLUDE_FROM_ALL vendored deps.
+# sodium / mldsa_native / mlkem_native / crypto are EXCLUDE_FROM_ALL vendored deps.
 
 if(PP_CRYPTO_BUILD_TESTS)
   enable_testing()

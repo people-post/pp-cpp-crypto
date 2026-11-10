@@ -27,8 +27,7 @@ public:
   static Roe<MlDsaKeyPair> GenerateKeyPairFromSeed(const ByteVector& seed);
   /** Randomized ML-DSA.Sign; empty ctx allowed. */
   static Roe<ByteVector> Sign(const ByteVector& secret_key, const ByteVector& message);
-  static Roe<bool> Verify(const ByteVector& public_key, const ByteVector& message,
-                          const ByteVector& signature);
+  static Roe<bool> Verify(const ByteVector& public_key, const ByteVector& message, const ByteVector& signature);
 };
 
 } // namespace pp

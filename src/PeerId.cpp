@@ -31,9 +31,9 @@ void AppendVarint(std::vector<uint8_t>& out, uint64_t value) {
 std::vector<uint8_t> PublicKeyEncoding(const ByteVector& key) {
   std::vector<uint8_t> out;
   out.reserve(key.size() + 8);
-  AppendVarint(out, (1u << 3) | 0u);  // field 1, varint
+  AppendVarint(out, (1u << 3) | 0u); // field 1, varint
   AppendVarint(out, kKeyTypeMlDsa65);
-  AppendVarint(out, (2u << 3) | 2u);  // field 2, length-delimited
+  AppendVarint(out, (2u << 3) | 2u); // field 2, length-delimited
   AppendVarint(out, key.size());
   out.insert(out.end(), key.begin(), key.end());
   return out;
