@@ -15,5 +15,11 @@
     "tag": "v2.0.0",
     "commit": "834a90d5e846ffa1e1611bd24e160bb2e9b86d35",
     "notes": "Vendored lean mldsa/ tree (C backend, ML-DSA-65); see README.pp-cpp-crypto.md"
+  },
+  "boringssl": {
+    "repository": "https://github.com/google/boringssl.git",
+    "tag": "0.20261105.0",
+    "commit": "3dc4b63808921e914a3fb1fa61869abc3938781b",
+    "notes": "Vendored lean tree (library sources only); see README.pp-cpp-crypto.md"
   }
 }

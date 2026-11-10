@@ -10,9 +10,10 @@ declare -A REPOS=(
   [libsodium]="https://github.com/jedisct1/libsodium.git|1.0.20-RELEASE"
   [mlkem-native]="https://github.com/pq-code-package/mlkem-native.git|v2.0.0"
   [mldsa-native]="https://github.com/pq-code-package/mldsa-native.git|v2.0.0"
+  [boringssl]="https://github.com/google/boringssl.git|0.20261105.0"
 )
 
-DEFAULT_ORDER=(libsodium mlkem-native mldsa-native)
+DEFAULT_ORDER=(libsodium mlkem-native mldsa-native boringssl)
 
 preserve_pp_cmake() {
   local name="$1"
@@ -192,6 +193,65 @@ Path(path).write_text(json.dumps(data))
 PY
 }
 
+# BoringSSL: only what the library targets build (crypto, ssl and the ones its
+# CMakeLists always declares), from gen/sources.json. Tests, fuzzers, Rust and
+# test vectors stay upstream; the consumer configures with BUILD_TESTING off.
+import_boringssl_lean() {
+  local name="$1"
+  local url="$2"
+  local tag="$3"
+  local dest="${THIRD_PARTY}/${name}"
+  local clone_dir="${TMP}/${name}"
+
+  echo "==> ${name} @ ${tag} (lean)"
+  local readme_backup="${TMP}/${name}_README.pp-cpp-crypto.md"
+  if [[ -f "${dest}/README.pp-cpp-crypto.md" ]]; then
+    cp "${dest}/README.pp-cpp-crypto.md" "${readme_backup}"
+  fi
+
+  git clone --depth 1 --branch "${tag}" "${url}" "${clone_dir}"
+  local commit
+  commit="$(git -C "${clone_dir}" rev-parse HEAD)"
+
+  rm -rf "${dest}"
+  mkdir -p "${dest}"
+  python3 - "${clone_dir}" "${dest}" <<'PY'
+import json, shutil, sys
+from pathlib import Path
+src, dest = Path(sys.argv[1]), Path(sys.argv[2])
+targets = ["bcm", "crypto", "ssl", "decrepit", "pki", "bssl"]
+files = {"CMakeLists.txt", "LICENSE", "gen/sources.cmake", "gen/sources.json"}
+files.update(str(p.relative_to(src)) for d in ("cmake", "include") for p in (src / d).rglob("*") if p.is_file())
+sources = json.loads((src / "gen/sources.json").read_text())
+for target in targets:
+    for paths in sources[target].values():
+        files.update(paths)
+for rel in sorted(files):
+    out = dest / rel
+    out.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src / rel, out)
+print(f"copied {len(files)} files")
+PY
+  echo "${commit}" > "${dest}/UPSTREAM_COMMIT"
+  if [[ -f "${readme_backup}" ]]; then
+    cp "${readme_backup}" "${dest}/README.pp-cpp-crypto.md"
+  fi
+
+  python3 - "${PATCH_JSON}" "${name}" "${url}" "${tag}" "${commit}" <<'PY'
+import json, sys
+from pathlib import Path
+path, name, url, tag, commit = sys.argv[1:6]
+data = json.loads(Path(path).read_text())
+data[name] = {
+    "repository": url,
+    "tag": tag,
+    "commit": commit,
+    "notes": "Vendored lean tree (library sources only); see README.pp-cpp-crypto.md",
+}
+Path(path).write_text(json.dumps(data))
+PY
+}
+
 mkdir -p "${THIRD_PARTY}"
 rm -rf "${TMP}"
 mkdir -p "${TMP}"
@@ -214,6 +274,10 @@ for name in "${ORDER[@]}"; do
 
   if [[ "${name}" == "mlkem-native" || "${name}" == "mldsa-native" ]]; then
     import_pqcp_lean "${name}" "${url}" "${tag}"
+    continue
+  fi
+  if [[ "${name}" == "boringssl" ]]; then
+    import_boringssl_lean "${name}" "${url}" "${tag}"
     continue
   fi
 
