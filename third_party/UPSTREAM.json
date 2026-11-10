@@ -20,6 +20,6 @@
     "repository": "https://github.com/google/boringssl.git",
     "tag": "0.20261105.0",
     "commit": "3dc4b63808921e914a3fb1fa61869abc3938781b",
-    "notes": "Vendored lean tree (library sources only); see README.pp-cpp-crypto.md"
+    "notes": "Vendored lean tree (library sources only, INSTALL_ENABLED made overridable); see README.pp-cpp-crypto.md"
   }
 }

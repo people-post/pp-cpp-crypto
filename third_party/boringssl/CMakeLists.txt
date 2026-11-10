@@ -34,7 +34,9 @@ enable_language(CXX)
 include(CTest)
 include(GNUInstallDirs)
 
-set(INSTALL_ENABLED 1)
+if(NOT DEFINED INSTALL_ENABLED)  # pp-cpp-crypto: the consumer may turn installs off
+  set(INSTALL_ENABLED 1)
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CMAKE_CROSSCOMPILING AND
    BUILD_TESTING)

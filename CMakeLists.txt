@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(pp-cpp-crypto VERSION 1.3.0 LANGUAGES C CXX)
+project(pp-cpp-crypto VERSION 1.3.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,6 +33,9 @@ endif()
 function(pp_crypto_add_boringssl)
   set(BUILD_TESTING OFF)
   set(BUILD_SHARED_LIBS OFF)
+  # Linked statically into the consumer: none of BoringSSL belongs in its install (and on iOS, where every
+  # executable is a bundle, its install rule for the bssl tool fails the configure).
+  set(INSTALL_ENABLED 0)
   if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64|x86_64|amd64|x86|i[3-6]86")
     include(CheckLanguage)
     check_language(ASM_NASM)
