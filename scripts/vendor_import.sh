@@ -237,6 +237,22 @@ PY
     cp "${readme_backup}" "${dest}/README.pp-cpp-crypto.md"
   fi
 
+  # The one source edit: upstream sets INSTALL_ENABLED unconditionally, so its install rules (libraries, headers,
+  # the bssl tool) land in every consumer's install — and fail on iOS, where executables are bundles. Let the
+  # caller turn them off.
+  python3 - "${dest}/CMakeLists.txt" <<'PY'
+import sys
+from pathlib import Path
+path = Path(sys.argv[1])
+text = path.read_text()
+old = "set(INSTALL_ENABLED 1)\n"
+new = "if(NOT DEFINED INSTALL_ENABLED)  # pp-cpp-crypto: the consumer may turn installs off\n  set(INSTALL_ENABLED 1)\nendif()\n"
+if text.count(old) != 1:
+    raise SystemExit("boringssl: INSTALL_ENABLED line not found once")
+path.write_text(text.replace(old, new))
+print("patched boringssl INSTALL_ENABLED")
+PY
+
   python3 - "${PATCH_JSON}" "${name}" "${url}" "${tag}" "${commit}" <<'PY'
 import json, sys
 from pathlib import Path
@@ -246,7 +262,7 @@ data[name] = {
     "repository": url,
     "tag": tag,
     "commit": commit,
-    "notes": "Vendored lean tree (library sources only); see README.pp-cpp-crypto.md",
+    "notes": "Vendored lean tree (library sources only, INSTALL_ENABLED made overridable); see README.pp-cpp-crypto.md",
 }
 Path(path).write_text(json.dumps(data))
 PY
