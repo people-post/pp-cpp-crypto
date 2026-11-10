@@ -43,8 +43,7 @@ Roe<ByteVector> MlDsa::Sign(const ByteVector& secret_key, const ByteVector& mess
   return sig;
 }
 
-Roe<bool> MlDsa::Verify(const ByteVector& public_key, const ByteVector& message,
-                        const ByteVector& signature) {
+Roe<bool> MlDsa::Verify(const ByteVector& public_key, const ByteVector& message, const ByteVector& signature) {
   if (public_key.size() != kMlDsa65PublicKeyBytes) {
     return Error("Invalid ML-DSA-65 public key size");
   }

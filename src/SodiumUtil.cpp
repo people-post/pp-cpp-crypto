@@ -65,8 +65,8 @@ Roe<ByteVector> Base64Decode(const std::string& encoded) {
   EnsureSodiumInit();
   ByteVector out(encoded.size());
   size_t out_len = 0;
-  if (sodium_base642bin(out.data(), out.size(), encoded.c_str(), encoded.size(), nullptr, &out_len,
-                        nullptr, sodium_base64_VARIANT_ORIGINAL) != 0) {
+  if (sodium_base642bin(out.data(), out.size(), encoded.c_str(), encoded.size(), nullptr, &out_len, nullptr,
+                        sodium_base64_VARIANT_ORIGINAL) != 0) {
     return Error("Base64 decode failed");
   }
   out.resize(out_len);
