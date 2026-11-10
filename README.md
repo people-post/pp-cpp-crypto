@@ -5,7 +5,8 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 ## Contents
 
 - Vendored **libsodium** (CMake target `sodium`), built with its SIMD implementations (picked by the CPU at run time)
-- Vendored lean **BoringSSL** (CMake targets `crypto` / `ssl`): the AEAD engine, and TLS for consumers that want it
+- Vendored lean **BoringSSL** (CMake targets `crypto` / `ssl`, headers in `PP_CRYPTO_BORINGSSL_INCLUDE_DIR`): the AEAD
+  engine, and TLS for consumers that want it. Windows x86 builds need NASM for its assembly
 - Lean **mlkem-native** (ML-KEM-768) and **mldsa-native** (ML-DSA-65) — CMake targets `mlkem_native` / `mldsa_native`
 - Thin C++ wrappers: `pp::MlDsa`, `pp::MlKem`, `pp::XChaCha20Poly1305` (AEAD over BoringSSL, libsodium-compatible bytes; `SealInto` / `OpenInto` for
   allocation-free packets), `pp::EnsureSodiumInit`, hex / base64 /

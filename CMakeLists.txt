@@ -43,6 +43,9 @@ function(pp_crypto_add_boringssl)
   endif()
   add_subdirectory("${PP_CRYPTO_THIRD_PARTY_DIR}/boringssl"
                    "${CMAKE_CURRENT_BINARY_DIR}/third_party/boringssl" EXCLUDE_FROM_ALL)
+  # For a consumer's find_package(OpenSSL) shim (curl wants a header directory, not a target).
+  set(PP_CRYPTO_BORINGSSL_INCLUDE_DIR "${PP_CRYPTO_THIRD_PARTY_DIR}/boringssl/include"
+      CACHE INTERNAL "BoringSSL public headers (targets crypto / ssl)")
 endfunction()
 
 if(NOT TARGET crypto)
