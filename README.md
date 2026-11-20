@@ -27,11 +27,11 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-CI builds and tests on Ubuntu 24.04, Windows 2022, and macOS 14 for every PR to `develop` / `main`.
+CI builds and tests on Ubuntu 24.04, Windows 2022, and macOS 14 for every PR to `main`.
 
 ## Consume (FetchContent)
 
-Pin a **release tag cut from `main`** (do not track `develop` or floating branch tips):
+Pin a **release tag cut from `main`** (do not track floating branch tips such as `main`):
 
 ```cmake
 include(FetchContent)
@@ -47,7 +47,7 @@ target_link_libraries(your_target PUBLIC pp_crypto)
 
 For a local sibling checkout (e.g. `../pp-cpp-crypto`), pass `-DPP_CPP_CRYPTO_SOURCE_DIR=...` from the consumer.
 
-Release flow: land on `develop` → merge to `main` → tag `vX.Y.Z` on `main`.
+Release flow: land on `main` (the only branch; there is no `develop`) → tag `vX.Y.Z` on `main`.
 
 ## Re-import vendors
 
