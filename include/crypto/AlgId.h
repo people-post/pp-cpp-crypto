@@ -35,7 +35,7 @@ enum class AlgKind : uint8_t {
   kKdf = 5,
 };
 
-/** Invalid in every kind: a reader treats it as an unknown algorithm. */
+/** Invalid in every kind: a typed blob with id 0 is malformed (no writer makes one), not an unknown algorithm. */
 inline constexpr uint8_t kAlgIdInvalid = 0;
 
 inline constexpr uint8_t kSignatureAlgMlDsa65 = 1;
@@ -123,9 +123,9 @@ size_t TypedBlobBodyBytes(BlobKind kind, const AlgInfo& alg);
  */
 inline constexpr int32_t kAlgIdErrorCategory = 0x616c67; // "alg"
 enum class TypedBlobError : int32_t {
-  /** Empty, or a known id with the wrong body size. */
+  /** Empty, id 0 (invalid), or a known id with the wrong body size. */
   kMalformed = 1,
-  /** Id 0, or an id this build does not know for the blob's kind: the caller reports "update needed". */
+  /** A nonzero id this build does not know for the blob's kind: the caller reports "update needed". */
   kUnknownAlgorithm = 2,
 };
 
@@ -141,15 +141,16 @@ struct TypedBlob {
 };
 
 /**
- * `id ‖ body`. `kUnknownAlgorithm` when `id` is not in the registry for the blob kind's algorithm kind,
- * `kMalformed` when `body` is not the algorithm's size (shorter than nonce + tag for `kAeadSealed`).
+ * `id ‖ body`. `kMalformed` for id 0; `kUnknownAlgorithm` when a nonzero `id` is not in the registry for the blob
+ * kind's algorithm kind; `kMalformed` when `body` is not the algorithm's size (shorter than nonce + tag for
+ * `kAeadSealed`).
  */
 Roe<ByteVector> EncodeTypedBlob(BlobKind kind, uint8_t id, std::span<const uint8_t> body);
 
 /**
- * Read a typed blob of `kind`. Checked in order: empty → `kMalformed`; the id byte not known for the kind (0 included)
- * → `kUnknownAlgorithm`, whatever follows (a later algorithm's sizes are unknown here); a body of the wrong size →
- * `kMalformed`.
+ * Read a typed blob of `kind`. Checked in order: empty → `kMalformed`; id 0 → `kMalformed` (invalid, like ExtArea's
+ * type 0x0000); a nonzero id not known for the kind → `kUnknownAlgorithm`, whatever follows (a later algorithm's sizes
+ * are unknown here); a known id with a body of the wrong size → `kMalformed`.
  */
 Roe<TypedBlob> DecodeTypedBlob(BlobKind kind, std::span<const uint8_t> blob);
 

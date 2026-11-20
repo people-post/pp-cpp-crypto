@@ -45,6 +45,10 @@ Error AlgError(TypedBlobError code, std::string message) {
   return Error::Make(kAlgIdErrorCategory, static_cast<int32_t>(code), message);
 }
 
+Error InvalidId(BlobKind kind) {
+  return AlgError(TypedBlobError::kMalformed, std::string(BlobKindName(kind)) + ": algorithm id 0 is invalid");
+}
+
 Error UnknownAlgorithm(BlobKind kind, uint8_t id) {
   return AlgError(TypedBlobError::kUnknownAlgorithm, std::string(BlobKindName(kind)) + ": unknown " +
                                                          std::string(AlgKindName(BlobAlgKind(kind))) +
@@ -169,6 +173,9 @@ bool IsMalformedTypedBlob(const Error& error) {
 }
 
 Roe<ByteVector> EncodeTypedBlob(const BlobKind kind, const uint8_t id, const std::span<const uint8_t> body) {
+  if (id == kAlgIdInvalid) {
+    return InvalidId(kind);
+  }
   const AlgInfo* alg = FindAlg(BlobAlgKind(kind), id);
   if (alg == nullptr) {
     return UnknownAlgorithm(kind, id);
@@ -185,6 +192,9 @@ Roe<ByteVector> EncodeTypedBlob(const BlobKind kind, const uint8_t id, const std
 Roe<TypedBlob> DecodeTypedBlob(const BlobKind kind, const std::span<const uint8_t> blob) {
   if (blob.empty()) {
     return AlgError(TypedBlobError::kMalformed, std::string(BlobKindName(kind)) + ": empty, no algorithm id");
+  }
+  if (blob[0] == kAlgIdInvalid) {
+    return InvalidId(kind);
   }
   const AlgInfo* alg = FindAlg(BlobAlgKind(kind), blob[0]);
   if (alg == nullptr) {

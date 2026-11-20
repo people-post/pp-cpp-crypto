@@ -1,5 +1,5 @@
 // Frozen typed-blob vectors (pp-browser SIGNED_FORMATS § 6, "Typed blobs"): the algorithm registry with each id's
-// sizes, and typed blobs of every blob kind — accepted, unknown algorithm (id 0, unassigned ids) and malformed. The
+// sizes, and typed blobs of every blob kind — accepted, unknown algorithm (unassigned ids) and malformed (id 0 too). The
 // file is read here and copied byte for byte into pp-browser and the relay (`crypto/alg-id.ts`), which read it alike.
 // Everything in it is deterministic, so the committed file must equal what this test builds;
 // PP_WRITE_ALG_ID_VECTORS=<path> writes it (only with a registry change, which is a new id, never a changed one).
@@ -155,7 +155,7 @@ Object BuildVectors() {
       }
     }
     add(kind, ByteVector{}, "malformed", "empty: no algorithm id");
-    add(kind, Blob(kAlgIdInvalid, 3), "unknown_algorithm", "id 0 is invalid");
+    add(kind, Blob(kAlgIdInvalid, 3), "malformed", "id 0 is invalid");
     const uint8_t next = NextId(BlobAlgKind(kind));
     add(kind, Blob(next, 3), "unknown_algorithm",
         "id " + std::to_string(next) + ", the next of its kind, is not assigned");
@@ -271,10 +271,10 @@ TEST(AlgIdVectorsTest, TheCommittedBlobsDecodeAsStated) {
       EXPECT_TRUE(IsMalformedTypedBlob(decoded.error())) << note << ": " << decoded.error().message;
     }
   }
-  // Every blob kind: accepted, refused as unknown (id 0, unassigned, 255) and malformed (empty, wrong sizes).
+  // Every blob kind: accepted, refused as unknown (unassigned, 255) and malformed (empty, id 0, wrong sizes).
   EXPECT_EQ(ok, std::size(kAllBlobKinds) + 1);
-  EXPECT_EQ(unknown, 3 * std::size(kAllBlobKinds) + 1);
-  EXPECT_EQ(malformed, 3 * std::size(kAllBlobKinds) - 1);
+  EXPECT_EQ(unknown, 2 * std::size(kAllBlobKinds) + 1);
+  EXPECT_EQ(malformed, 4 * std::size(kAllBlobKinds) - 1);
 }
 
 } // namespace

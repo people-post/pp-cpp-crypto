@@ -124,8 +124,8 @@ TEST(AlgIdTest, TheAeadBlobIsThePayloadBlob) {
 }
 
 TEST(AlgIdTest, UnknownAlgorithmIsNotMalformed) {
-  // Unknown id: "update needed", whatever the body.
-  for (const uint8_t id : {uint8_t{0}, uint8_t{2}, uint8_t{0xff}}) {
+  // Unknown nonzero id: "update needed", whatever the body.
+  for (const uint8_t id : {uint8_t{2}, uint8_t{0xff}}) {
     ByteVector blob(1 + kMlDsa65PublicKeyBytes, 0x01);
     blob[0] = id;
     auto decoded = DecodeTypedBlob(BlobKind::kSignaturePublicKey, blob);
@@ -139,6 +139,15 @@ TEST(AlgIdTest, UnknownAlgorithmIsNotMalformed) {
   // Known id, wrong size: malformed.
   for (const size_t size : {size_t{0}, kMlDsa65PublicKeyBytes - 1, kMlDsa65PublicKeyBytes + 1}) {
     ByteVector blob(1 + size, 0x01);
+    auto decoded = DecodeTypedBlob(BlobKind::kSignaturePublicKey, blob);
+    ASSERT_FALSE(static_cast<bool>(decoded)) << size;
+    EXPECT_TRUE(IsMalformedTypedBlob(decoded.error())) << decoded.error().message;
+    EXPECT_FALSE(IsUnknownAlgorithm(decoded.error()));
+  }
+  // Id 0 is invalid: malformed, whatever the body (no writer makes it, so it is not "update needed").
+  for (const size_t size : {size_t{0}, size_t{2}, kMlDsa65PublicKeyBytes}) {
+    ByteVector blob(1 + size, 0x01);
+    blob[0] = kAlgIdInvalid;
     auto decoded = DecodeTypedBlob(BlobKind::kSignaturePublicKey, blob);
     ASSERT_FALSE(static_cast<bool>(decoded)) << size;
     EXPECT_TRUE(IsMalformedTypedBlob(decoded.error())) << decoded.error().message;
@@ -164,7 +173,7 @@ TEST(AlgIdTest, AKeyOfOneKindIsNotAnotherKindsBlob) {
 
 TEST(AlgIdTest, EncodeRefusesWhatDecodeRefuses) {
   const ByteVector key(kMlDsa65PublicKeyBytes, 0x01);
-  EXPECT_TRUE(IsUnknownAlgorithm(EncodeTypedBlob(BlobKind::kSignaturePublicKey, 0, key).error()));
+  EXPECT_TRUE(IsMalformedTypedBlob(EncodeTypedBlob(BlobKind::kSignaturePublicKey, 0, key).error()));
   EXPECT_TRUE(IsUnknownAlgorithm(EncodeTypedBlob(BlobKind::kSignaturePublicKey, 2, key).error()));
   EXPECT_TRUE(IsMalformedTypedBlob(
       EncodeTypedBlob(BlobKind::kSignaturePublicKey, 1, ByteVector(kMlDsa65PublicKeyBytes - 1)).error()));

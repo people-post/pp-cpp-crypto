@@ -16,14 +16,15 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 - `pp::PeerIdFromMlDsaPublicKey`: the mesh PeerId of an ML-DSA-65 key (byte layout and golden vectors in `crypto/PeerId.h`)
 - `crypto/AlgId.h`: the algorithm registry (ids per kind: signature `ml-dsa-65` 1, KEM `ml-kem-768` 1, AEAD
   `xchacha20-poly1305` 1, hash `blake2b-256` 1 / `sha2-256` 2, KDF `hkdf-sha256` 1; 0 is invalid) with each id's sizes, and
-  typed blobs (`u8 id ‖ body`: `EncodeTypedBlob` / `DecodeTypedBlob`, an unknown id told apart from a malformed blob)
+  typed blobs (`u8 id ‖ body`: `EncodeTypedBlob` / `DecodeTypedBlob`; a nonzero unknown id — "update needed" — told
+  apart from a malformed blob: empty, id 0, or a known id with the wrong size)
 
 ## Frozen vectors
 
 Read by the tests; other implementations copy them byte for byte.
 
-- `tests/data/alg_id_vectors.json`: the registry and typed blobs of every kind (accepted, unknown id, malformed), read
-  by pp-browser and the relay. Deterministic: the test rebuilds it and compares; `PP_WRITE_ALG_ID_VECTORS=<path>`
+- `tests/data/alg_id_vectors.json`: the registry and typed blobs of every kind (accepted, unknown nonzero id,
+  malformed including id 0), read by pp-browser and the relay. Deterministic: the test rebuilds it and compares; `PP_WRITE_ALG_ID_VECTORS=<path>`
   writes it (a new id only — ids never change).
 - `tests/data/seeded_keygen_vectors.json`: seeded ML-DSA-65 / ML-KEM-768 keygen goldens (key hashes and PeerIds from
   fixed seeds, a frozen signature that must verify, a frozen ciphertext that must decapsulate). They guard identity

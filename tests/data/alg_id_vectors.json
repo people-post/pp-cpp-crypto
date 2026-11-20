@@ -183,7 +183,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "signature-public-key",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -227,7 +227,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "signature-secret-key",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -271,7 +271,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "signature",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -315,7 +315,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "kem-public-key",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -359,7 +359,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "kem-private-key",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -403,7 +403,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "kem-ciphertext",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
@@ -449,7 +449,7 @@
     {
       "note": "id 0 is invalid",
       "blob_kind": "aead-sealed",
-      "result": "unknown_algorithm",
+      "result": "malformed",
       "blob_hex": "00000102"
     },
     {
