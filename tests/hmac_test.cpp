@@ -29,14 +29,19 @@ TEST(HmacSha256Test, TagsAreLibsodiumsForEveryKeyAndMessageSize) {
   EnsureSodiumInit();
   for (size_t key_size : {0u, 1u, 32u, 63u, 64u, 65u, 131u}) {
     ByteVector key(key_size);
-    randombytes_buf(key.data(), key.size());
+    if (!key.empty()) { // an empty vector's data() may be null: randombytes_buf declares it nonnull
+      randombytes_buf(key.data(), key.size());
+    }
     const HmacSha256 mac(key);
     for (size_t size : {0u, 1u, 40u, 55u, 56u, 64u, 119u, 120u, 1100u, 4096u}) {
       ByteVector data(size);
-      randombytes_buf(data.data(), data.size());
+      if (!data.empty()) {
+        randombytes_buf(data.data(), data.size());
+      }
 
       crypto_auth_hmacsha256_state state;
-      crypto_auth_hmacsha256_init(&state, key.data(), key.size());
+      const uint8_t none = 0; // libsodium declares the key nonnull, and an empty vector's data() may be null
+      crypto_auth_hmacsha256_init(&state, key.empty() ? &none : key.data(), key.size());
       crypto_auth_hmacsha256_update(&state, data.data(), data.size());
       HmacSha256::Tag theirs;
       crypto_auth_hmacsha256_final(&state, theirs.data());
