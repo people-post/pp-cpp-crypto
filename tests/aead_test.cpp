@@ -46,7 +46,9 @@ TEST(XChaCha20Poly1305Test, RejectsWrongSizes) {
 
 ByteVector RandomBytes(size_t n) {
   ByteVector bytes(n);
-  randombytes_buf(bytes.data(), bytes.size());
+  if (!bytes.empty()) { // an empty vector's data() may be null: randombytes_buf declares it nonnull
+    randombytes_buf(bytes.data(), bytes.size());
+  }
   return bytes;
 }
 

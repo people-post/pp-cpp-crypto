@@ -62,6 +62,9 @@ std::string BytesToHex(const ByteVector& bytes) {
 }
 
 Roe<ByteVector> Base64Decode(const std::string& encoded) {
+  if (encoded.empty()) {
+    return ByteVector{}; // RFC 4648: "" encodes no bytes; libsodium must not get the null buffer of an empty vector
+  }
   EnsureSodiumInit();
   ByteVector out(encoded.size());
   size_t out_len = 0;
@@ -93,6 +96,9 @@ std::string Base64UrlEncode(const ByteVector& bytes) {
 }
 
 Roe<ByteVector> Base64UrlDecode(const std::string& encoded) {
+  if (encoded.empty()) {
+    return ByteVector{}; // as Base64Decode: no null output buffer for libsodium
+  }
   EnsureSodiumInit();
   ByteVector out(encoded.size());
   size_t length = 0;

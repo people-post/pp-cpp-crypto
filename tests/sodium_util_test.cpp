@@ -29,6 +29,21 @@ TEST(SodiumUtilTest, Base64UrlRoundTripsWithoutPadding) {
   EXPECT_FALSE(static_cast<bool>(Base64UrlDecode("+/8A"))) << "the standard alphabet is not base64url";
 }
 
+// "" is the base64 of no bytes (RFC 4648 § 10). Decoding it must not hand libsodium the null buffer of an empty output
+// vector (`sodium_base642bin` declares it nonnull: undefined behaviour, which UBSan reports).
+TEST(SodiumUtilTest, EmptyBase64DecodesToNoBytes) {
+  auto decoded = Base64Decode("");
+  ASSERT_TRUE(static_cast<bool>(decoded)) << decoded.error().message;
+  EXPECT_TRUE(decoded->empty());
+  auto decoded_url = Base64UrlDecode("");
+  ASSERT_TRUE(static_cast<bool>(decoded_url)) << decoded_url.error().message;
+  EXPECT_TRUE(decoded_url->empty());
+  EXPECT_EQ(Base64Encode({}), "");
+  EXPECT_EQ(Base64UrlEncode({}), "");
+  EXPECT_FALSE(static_cast<bool>(Base64Decode("="))) << "not empty: still checked";
+  EXPECT_FALSE(static_cast<bool>(Base64UrlDecode("*")));
+}
+
 TEST(SodiumUtilTest, Blake2b256OfNothingIsTheKnownVector) {
   // RFC 7693 BLAKE2b with a 32-byte digest, empty input.
   EXPECT_EQ(BytesToHex(Blake2b256({})), "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8");
