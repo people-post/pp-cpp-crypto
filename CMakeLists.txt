@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(pp-cpp-crypto VERSION 1.3.1 LANGUAGES C CXX)
+project(pp-cpp-crypto VERSION 1.4.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -61,7 +61,7 @@ if(NOT TARGET pp_common)
   include(FetchContent)
   set(PP_CPP_COMMON_GIT_REPOSITORY "https://github.com/people-post/pp-cpp-common.git"
     CACHE STRING "Git remote for pp-cpp-common")
-  set(PP_CPP_COMMON_GIT_TAG "v0.1.0"
+  set(PP_CPP_COMMON_GIT_TAG "v1.4.0"
     CACHE STRING "Release tag on pp-cpp-common main")
   set(PP_COMMON_BUILD_TESTS OFF CACHE BOOL "Build pp-cpp-common tests" FORCE)
   FetchContent_Declare(
@@ -79,6 +79,7 @@ endif()
 # --- C++ wrappers ---
 
 add_library(pp_crypto STATIC
+  src/AlgId.cpp
   src/Aead.cpp
   src/Hmac.cpp
   src/SodiumUtil.cpp
@@ -122,12 +123,19 @@ if(PP_CRYPTO_BUILD_TESTS)
 
   add_executable(pp_crypto_test
     tests/aead_test.cpp
+    tests/alg_id_test.cpp
+    tests/alg_id_vectors_test.cpp
     tests/hmac_test.cpp
     tests/ml_dsa_test.cpp
     tests/ml_kem_test.cpp
     tests/peer_id_test.cpp
     tests/replay_window_test.cpp
+    tests/seeded_keygen_test.cpp
     tests/sodium_util_test.cpp)
+  # Frozen vector files, read in place; PP_WRITE_ALG_ID_VECTORS / PP_WRITE_SEEDED_KEYGEN_VECTORS=<path> rewrite them.
+  target_compile_definitions(pp_crypto_test PRIVATE
+    PP_ALG_ID_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/alg_id_vectors.json"
+    PP_SEEDED_KEYGEN_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/seeded_keygen_vectors.json")
   target_link_libraries(pp_crypto_test PRIVATE
     pp_crypto
     GTest::gtest
