@@ -57,10 +57,6 @@
   "unknown_ids": [
     {
       "kind": "signature",
-      "id": 0
-    },
-    {
-      "kind": "signature",
       "id": 2
     },
     {
@@ -69,10 +65,6 @@
     },
     {
       "kind": "kem",
-      "id": 0
-    },
-    {
-      "kind": "kem",
       "id": 2
     },
     {
@@ -81,19 +73,11 @@
     },
     {
       "kind": "aead",
-      "id": 0
-    },
-    {
-      "kind": "aead",
       "id": 2
     },
     {
       "kind": "aead",
       "id": 255
-    },
-    {
-      "kind": "hash",
-      "id": 0
     },
     {
       "kind": "hash",
@@ -102,10 +86,6 @@
     {
       "kind": "hash",
       "id": 255
-    },
-    {
-      "kind": "kdf",
-      "id": 0
     },
     {
       "kind": "kdf",
