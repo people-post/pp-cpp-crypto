@@ -105,9 +105,11 @@ Object BuildVectors() {
     registry.push_back(ObjectValue(std::move(row)));
   }
 
+  // Ids a later release may assign: a reader treats them as "update needed". Id 0 is not one of them: it is invalid
+  // (malformed), and appears only in the blob rows below.
   std::vector<Value> unknown_ids;
   for (const AlgKind kind : kAllAlgKinds) {
-    for (const uint8_t id : {kAlgIdInvalid, NextId(kind), uint8_t{0xff}}) {
+    for (const uint8_t id : {NextId(kind), uint8_t{0xff}}) {
       Object row;
       row.set("kind", std::string(AlgKindName(kind)));
       row.set("id", int64_t{id});
@@ -226,7 +228,7 @@ TEST(AlgIdVectorsTest, TheCommittedRegistryRowsAreKnown) {
   }
   const common::Array* unknown = root->getArray("unknown_ids");
   ASSERT_NE(unknown, nullptr);
-  ASSERT_EQ(unknown->elements.size(), 3 * std::size(kAllAlgKinds));
+  ASSERT_EQ(unknown->elements.size(), 2 * std::size(kAllAlgKinds));
   for (const Value& item : unknown->elements) {
     const Object* row = common::asObject(item);
     ASSERT_NE(row, nullptr);
@@ -234,6 +236,7 @@ TEST(AlgIdVectorsTest, TheCommittedRegistryRowsAreKnown) {
     ASSERT_TRUE(kind);
     const auto id = row->getNonNegInt("id");
     ASSERT_TRUE(id);
+    EXPECT_NE(*id, uint64_t{kAlgIdInvalid}) << "id 0 is invalid, not unknown";
     EXPECT_EQ(FindAlg(*kind, static_cast<uint8_t>(*id)), nullptr) << AlgKindName(*kind) << " " << *id;
   }
 }
