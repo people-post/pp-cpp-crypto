@@ -14,6 +14,21 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 - `pp::HmacSha256`: HMAC-SHA256 under one key with its pads hashed once (BoringSSL; libsodium-compatible tags)
 - `pp::ReplayWindow`: replay protection for out-of-order sequence numbers
 - `pp::PeerIdFromMlDsaPublicKey`: the mesh PeerId of an ML-DSA-65 key (byte layout and golden vectors in `crypto/PeerId.h`)
+- `crypto/AlgId.h`: the algorithm registry (ids per kind: signature `ml-dsa-65` 1, KEM `ml-kem-768` 1, AEAD
+  `xchacha20-poly1305` 1, hash `blake2b-256` 1 / `sha2-256` 2, KDF `hkdf-sha256` 1; 0 is invalid) with each id's sizes, and
+  typed blobs (`u8 id ‖ body`: `EncodeTypedBlob` / `DecodeTypedBlob`, an unknown id told apart from a malformed blob)
+
+## Frozen vectors
+
+Read by the tests; other implementations copy them byte for byte.
+
+- `tests/data/alg_id_vectors.json`: the registry and typed blobs of every kind (accepted, unknown id, malformed), read
+  by pp-browser and the relay. Deterministic: the test rebuilds it and compares; `PP_WRITE_ALG_ID_VECTORS=<path>`
+  writes it (a new id only — ids never change).
+- `tests/data/seeded_keygen_vectors.json`: seeded ML-DSA-65 / ML-KEM-768 keygen goldens (key hashes and PeerIds from
+  fixed seeds, a frozen signature that must verify, a frozen ciphertext that must decapsulate). They guard identity
+  recovery across library updates; a key row never changes. `PP_WRITE_SEEDED_KEYGEN_VECTORS=<path>` writes a fresh
+  file (new signature and ciphertext, the same keys) for a new row.
 
 Public headers live under `include/crypto/`.
 

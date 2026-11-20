@@ -1,0 +1,2 @@
+# Frozen vector files are compared byte for byte (and copied so into pp-browser and the relay): no CRLF on checkout.
+tests/data/*.json -text
