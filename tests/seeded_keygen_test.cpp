@@ -2,7 +2,7 @@
 // pp-browser derives its account, device and locker keys from seeds (the recovery phrase, PP_NODE_IDENTITY_SEED) and
 // the relay its operator, transport and signing keys, so a library update that changed seeded keygen would silently
 // re-key every recovered identity: a new Account ID and PeerId for the same phrase. Frozen here, in
-// tests/data/seeded_keygen_vectors.json:
+// pp-specs' vectors/seeded_keygen_vectors.json:
 //
 //  - ML-DSA-65 and ML-KEM-768 keys from fixed seeds: SHA-256 of the public key and of the secret key, and the PeerId;
 //  - a frozen ML-DSA-65 signature (signing is hedged, so it is frozen whole) that must verify under its seeded key;
