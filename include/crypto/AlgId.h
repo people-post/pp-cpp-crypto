@@ -25,7 +25,7 @@ namespace pp {
  *   kdf         1  hkdf-sha256          (output length chosen by the caller)
  *
  * Ids are frozen: an id is never reused for another algorithm, and a new algorithm takes the next id of its kind.
- * The registry is pinned by tests/data/alg_id_vectors.json (read by pp-browser and the relay byte for byte).
+ * The registry is pinned by pp-specs' vectors/alg_id_vectors.json (read by every implementation at its pinned tag).
  */
 enum class AlgKind : uint8_t {
   kSignature = 1,

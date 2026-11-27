@@ -120,6 +120,7 @@ if(PP_CRYPTO_BUILD_TESTS)
     GIT_TAG v1.14.0
   )
   FetchContent_MakeAvailable(googletest)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/PpSpecs.cmake)
 
   add_executable(pp_crypto_test
     tests/aead_test.cpp
@@ -132,10 +133,11 @@ if(PP_CRYPTO_BUILD_TESTS)
     tests/replay_window_test.cpp
     tests/seeded_keygen_test.cpp
     tests/sodium_util_test.cpp)
-  # Frozen vector files, read in place; PP_WRITE_ALG_ID_VECTORS / PP_WRITE_SEEDED_KEYGEN_VECTORS=<path> rewrite them.
+  # Frozen vector files, in pp-specs; PP_WRITE_ALG_ID_VECTORS / PP_WRITE_SEEDED_KEYGEN_VECTORS=<path> write fresh ones,
+  # for a pp-specs pull request.
   target_compile_definitions(pp_crypto_test PRIVATE
-    PP_ALG_ID_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/alg_id_vectors.json"
-    PP_SEEDED_KEYGEN_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/seeded_keygen_vectors.json")
+    PP_ALG_ID_VECTORS_PATH="${PP_SPECS_VECTORS_DIR}/alg_id_vectors.json"
+    PP_SEEDED_KEYGEN_VECTORS_PATH="${PP_SPECS_VECTORS_DIR}/seeded_keygen_vectors.json")
   target_link_libraries(pp_crypto_test PRIVATE
     pp_crypto
     GTest::gtest

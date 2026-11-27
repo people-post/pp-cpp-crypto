@@ -21,12 +21,14 @@ Shared C++ crypto for People Post apps (`namespace pp`).
 
 ## Frozen vectors
 
-Read by the tests; other implementations copy them byte for byte.
+In [pp-specs](https://github.com/people-post/pp-specs/blob/main/vectors/README.md), which every implementation reads at a pinned tag: the tests fetch them
+([`cmake/PpSpecs.cmake`](cmake/PpSpecs.cmake); `-DPP_SPECS_SOURCE_DIR=<checkout>` for a local one). A new case is written
+by the test here (`PP_WRITE_<NAME>_VECTORS=<path>`), added to pp-specs by pull request, and the pin moved.
 
-- `tests/data/alg_id_vectors.json`: the registry and typed blobs of every kind (accepted, unknown nonzero id,
+- `alg_id_vectors.json`: the registry and typed blobs of every kind (accepted, unknown nonzero id,
   malformed including id 0), read by pp-browser and the relay. Deterministic: the test rebuilds it and compares; `PP_WRITE_ALG_ID_VECTORS=<path>`
   writes it (a new id only — ids never change).
-- `tests/data/seeded_keygen_vectors.json`: seeded ML-DSA-65 / ML-KEM-768 keygen goldens (key hashes and PeerIds from
+- `seeded_keygen_vectors.json`: seeded ML-DSA-65 / ML-KEM-768 keygen goldens (key hashes and PeerIds from
   fixed seeds, a frozen signature that must verify, a frozen ciphertext that must decapsulate). They guard identity
   recovery across library updates; a key row never changes. `PP_WRITE_SEEDED_KEYGEN_VECTORS=<path>` writes a fresh
   file (new signature and ciphertext, the same keys) for a new row.
